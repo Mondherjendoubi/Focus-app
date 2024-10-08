@@ -27,8 +27,6 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
-    private OwnershipFilter ownershipFilter;
 
     @Autowired
     private JwtFilter jwtFilter;
@@ -48,14 +46,15 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity (only in development)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()  // Allow access to registration and login
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").permitAll()   // Allow DELETE requests for authenticated users
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/**").hasRole("ADMIN")  // Only admins can delete users
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("USER", "ADMIN")  // Users and admins can get user info
                         .anyRequest().authenticated()) // All other requests require authentication
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(ownershipFilter, JwtFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

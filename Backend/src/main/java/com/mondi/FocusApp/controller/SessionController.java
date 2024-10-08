@@ -43,9 +43,15 @@ public class SessionController {
 
     // Fetch all sessions for a specific user on a specific date
     @GetMapping("/user/{userId}/date/{date}")
-    public List<Session> getSessionsByUserAndDate(@PathVariable Long userId, @PathVariable String date) {
+    public ResponseEntity<List<Session>> getSessionsByUserAndDate(@PathVariable Long userId, @PathVariable String date) {
         LocalDate sessionDate = LocalDate.parse(date); // Convert string to LocalDate
-        return sessionService.getSessionsByUserAndDate(userId, sessionDate);
+        List<Session> sessions = sessionService.getSessionsByUserAndDate(userId, sessionDate);
+
+        if (sessions.isEmpty()) {
+            return ResponseEntity.noContent().build();  // Return 204 No Content if no sessions are found
+        } else {
+            return ResponseEntity.ok(sessions);  // Return 200 OK with the list of sessions
+        }
     }
 
 }

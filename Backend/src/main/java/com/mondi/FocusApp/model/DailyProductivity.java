@@ -23,8 +23,8 @@ public class DailyProductivity {
     private Double productivityScore;
     private LocalDate date;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore // Prevents infinite loop during serialization
-    private User user;
+    private User user;  // Many daily productivity records can belong to one user
 }

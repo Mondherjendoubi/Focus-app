@@ -27,11 +27,19 @@ public class User {
     @Column(unique = true)  // Enforce uniqueness on the username field
     private String username;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Session> sessions;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private DailyProductivity dailyProductivity;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<DailyProductivity> dailyProductivities;  // One user can have many daily productivity records
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private WeeklyProductivity weeklyProductivity;
